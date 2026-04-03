@@ -64,13 +64,13 @@ class ObjectiveCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              // MiniButton(
+              //   text: 'Ver actividades',
+              //   color: const Color(0xFFF9C2A4), // Naranja
+              //   onTap: onVerActividades,
+              // ),
               MiniButton(
-                text: 'Ver actividades',
-                color: const Color(0xFFF9C2A4), // Naranja
-                onTap: onVerActividades,
-              ),
-              MiniButton(
-                text: 'Editar',
+                text: 'Editar/Ver actividades',
                 color: const Color(0xFFA4DDF9), // Azul claro
                 onTap: onEditar,
               ),
@@ -92,11 +92,11 @@ class ObjectiveCard extends StatelessWidget {
 
     // Asignación de colores según el estado
     switch (estado.toLowerCase()) {
-      case 'vencida':
+      case 'vencido':
         gradientColors = [Colors.red, Colors.redAccent.shade700];
         break;
-      case 'completada':
-        gradientColors = [Colors.blue, Colors.blueAccent.shade700];
+      case 'completado':
+        gradientColors = [Colors.green, Colors.greenAccent.shade700];
         break;
       case 'en tiempo':
       default:

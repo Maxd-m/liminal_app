@@ -1,11 +1,12 @@
+// objetivos_db.dart (Basado en ObjetivosDB del turno anterior)
+
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class ObjetivosDB {
-  static final nameDB =
-      'ObjetivosDB'; // Cambia esto por el nombre de tu base de datos
+  static final nameDB = 'objetivosdb'; // Nombre de base de datos
   static final versionDB = 1;
 
   static Database? _database;
@@ -23,8 +24,7 @@ class ObjetivosDB {
       pathDB,
       version: versionDB,
       onCreate: _createTables,
-      // IMPORTANTE: SQLite tiene las llaves foráneas apagadas por defecto.
-      // Esta configuración las enciende para que funcionen tus relaciones.
+      // Enciende las llaves foráneas para que funcionen las relaciones
       onConfigure: (db) async {
         await db.execute('PRAGMA foreign_keys = ON');
       },
@@ -32,7 +32,7 @@ class ObjetivosDB {
   }
 
   _createTables(Database db, int version) async {
-    // 1. Tabla CATEGORIA (Se crea primero porque 'Actividad' depende de ella)
+    // 1. Creación de Tablas (Mismo código anterior)
     await db.execute('''
       CREATE TABLE Categoria(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -40,17 +40,16 @@ class ObjetivosDB {
       )
     ''');
 
-    // 2. Tabla OBJETIVO
     await db.execute('''
       CREATE TABLE Objetivo(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         objetivo VARCHAR(255) NOT NULL,
         antecedentes TEXT,
-        fecha_limite TEXT
+        fecha_limite TEXT,
+        completado INTEGER DEFAULT 0 -- 0 = Falso, 1 = Verdadero
       )
     ''');
 
-    // 3. Tabla ACTIVIDAD (Depende de Categoria)
     await db.execute('''
       CREATE TABLE Actividad(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -60,7 +59,6 @@ class ObjetivosDB {
       )
     ''');
 
-    // 4. Tabla Intermedia ACTIVIDAD_OBJETIVO (Depende de Actividad y Objetivo)
     await db.execute('''
       CREATE TABLE Actividad_Objetivo(
         id_objetivo INTEGER,
@@ -82,40 +80,40 @@ class ObjetivosDB {
 
     // Insertamos 3 Actividades para la Categoría 1
     await db.execute(
-      "INSERT INTO Actividad (actividad, id_categoria) VALUES ('Mi nombre', 1)",
+      "INSERT INTO Actividad (actividad, id_categoria) VALUES ('Mi nombre (recordar)', 1)",
     );
     await db.execute(
-      "INSERT INTO Actividad (actividad, id_categoria) VALUES ('A mi familia', 1)",
+      "INSERT INTO Actividad (actividad, id_categoria) VALUES ('A mi familia (recordar)', 1)",
     );
     await db.execute(
-      "INSERT INTO Actividad (actividad, id_categoria) VALUES ('El ruido', 1)",
+      "INSERT INTO Actividad (actividad, id_categoria) VALUES ('El ruido (recordar)', 1)",
     );
 
     // Insertamos 3 Actividades para la Categoría 2
     await db.execute(
-      "INSERT INTO Actividad (actividad, id_categoria) VALUES ('El cielo', 2)",
+      "INSERT INTO Actividad (actividad, id_categoria) VALUES ('El cielo (admirar)', 2)",
     );
     await db.execute(
-      "INSERT INTO Actividad (actividad, id_categoria) VALUES ('Un atardecer', 2)",
+      "INSERT INTO Actividad (actividad, id_categoria) VALUES ('Un atardecer (admirar)', 2)",
     );
     await db.execute(
-      "INSERT INTO Actividad (actividad, id_categoria) VALUES ('La repetición', 2)",
+      "INSERT INTO Actividad (actividad, id_categoria) VALUES ('La repetición (admirar)', 2)",
     );
 
     // Insertamos 3 Actividades para la Categoría 3
     await db.execute(
-      "INSERT INTO Actividad (actividad, id_categoria) VALUES ('Comer', 3)",
+      "INSERT INTO Actividad (actividad, id_categoria) VALUES ('Comer (sobrevivir)', 3)",
     );
     await db.execute(
-      "INSERT INTO Actividad (actividad, id_categoria) VALUES ('Tomar agua', 3)",
+      "INSERT INTO Actividad (actividad, id_categoria) VALUES ('Tomar agua (sobrevivir)', 3)",
     );
     await db.execute(
-      "INSERT INTO Actividad (actividad, id_categoria) VALUES ('Simular una conversación', 3)",
+      "INSERT INTO Actividad (actividad, id_categoria) VALUES ('Simular una conversación (sobrevivir)', 3)",
     );
   }
 
-  // --- MÉTODOS CRUD GENÉRICOS ---
-
+  // --- MÉTODOS CRUD GENÉRICOS (Keep them, as they are useful) ---
+  // (select, update, delete genéricos del turno anterior)
   Future<int> insert(String table, Map<String, dynamic> data) async {
     var conexion = await database;
     return conexion!.insert(table, data);
@@ -144,5 +142,127 @@ class ObjetivosDB {
   Future<List<Map<String, dynamic>>> select(String table) async {
     var conexion = await database;
     return await conexion!.query(table);
+  }
+
+  // --- MÉTODOS DE BASE DE DATOS ESPECÍFICOS PARA LA PANTALLA ---
+
+  // 1. Obtener todos los objetivos para ListScreen
+  Future<List<Map<String, dynamic>>> getAllObjectives() async {
+    return await select('Objetivo');
+  }
+
+  // 2. Obtener todas las categorías para el modal
+  Future<List<Map<String, dynamic>>> getAllCategories() async {
+    return await select('Categoria');
+  }
+
+  // 3. Obtener actividades para una categoría específica para el modal
+  Future<List<Map<String, dynamic>>> getActivitiesByCategory(
+    int categoryId,
+  ) async {
+    var conexion = await database;
+    return await conexion!.query(
+      'Actividad',
+      where: 'id_categoria = ?',
+      whereArgs: [categoryId],
+    );
+  }
+
+  // 4. Transacción compleja: Añadir un Objetivo y sus relaciones con actividades
+  Future<bool> addObjectiveWithActivities({
+    required String name,
+    required String antecedents,
+    required String dueDate,
+    required bool isCompleted, // <-- NUEVO PARÁMETRO
+    required List<Map<String, dynamic>> activitiesWithPriorities,
+  }) async {
+    var db = await database;
+    try {
+      await db!.transaction((txn) async {
+        int objectiveId = await txn.insert('Objetivo', {
+          'objetivo': name,
+          'antecedentes': antecedents,
+          'fecha_limite': dueDate,
+          'completado': isCompleted ? 1 : 0, // <-- GUARDAR COMO 1 o 0
+        });
+
+        for (var actWithPri in activitiesWithPriorities) {
+          await txn.insert('Actividad_Objetivo', {
+            'id_objetivo': objectiveId,
+            'id_actividad': actWithPri['idActividad'],
+            'prioridad_actividad': actWithPri['prioridad'],
+          });
+        }
+      });
+      return true;
+    } catch (e) {
+      print('Error al añadir objetivo: $e');
+      return false;
+    }
+  }
+
+  // 5. Obtener las actividades vinculadas a un objetivo específico (Para Editar)
+  Future<List<Map<String, dynamic>>> getActivitiesForObjective(
+    int objectiveId,
+  ) async {
+    var db = await database;
+    // Hacemos un JOIN para traer el nombre de la actividad y la prioridad guardada
+    return await db!.rawQuery(
+      '''
+      SELECT a.id as idActividad, a.actividad, ao.prioridad_actividad as prioridad
+      FROM Actividad a
+      INNER JOIN Actividad_Objetivo ao ON a.id = ao.id_actividad
+      WHERE ao.id_objetivo = ?
+    ''',
+      [objectiveId],
+    );
+  }
+
+  // 6. Transacción para Actualizar un Objetivo y sus actividades
+  Future<bool> updateObjectiveWithActivities({
+    required int id,
+    required String name,
+    required String antecedents,
+    required String dueDate,
+    required bool isCompleted,
+    required List<Map<String, dynamic>> activitiesWithPriorities,
+  }) async {
+    var db = await database;
+    try {
+      await db!.transaction((txn) async {
+        // 1. Actualizamos los datos principales del objetivo
+        await txn.update(
+          'Objetivo',
+          {
+            'objetivo': name,
+            'antecedentes': antecedents,
+            'fecha_limite': dueDate,
+            'completado': isCompleted ? 1 : 0,
+          },
+          where: 'id = ?',
+          whereArgs: [id],
+        );
+
+        // 2. Borramos las relaciones anteriores en Actividad_Objetivo
+        await txn.delete(
+          'Actividad_Objetivo',
+          where: 'id_objetivo = ?',
+          whereArgs: [id],
+        );
+
+        // 3. Insertamos las relaciones actualizadas (nuevas, editadas o conservadas)
+        for (var actWithPri in activitiesWithPriorities) {
+          await txn.insert('Actividad_Objetivo', {
+            'id_objetivo': id,
+            'id_actividad': actWithPri['idActividad'],
+            'prioridad_actividad': actWithPri['prioridad'],
+          });
+        }
+      });
+      return true;
+    } catch (e) {
+      print('Error al actualizar objetivo: $e');
+      return false;
+    }
   }
 }
