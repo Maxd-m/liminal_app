@@ -265,4 +265,62 @@ class ObjetivosDB {
       return false;
     }
   }
+
+  // 7. Obtener todas las actividades junto con el nombre de su categoría
+  Future<List<Map<String, dynamic>>> getAllActivities() async {
+    var db = await database;
+    // Usamos un JOIN para traer el nombre de la categoría y poder mostrarlo en el subtítulo
+    return await db!.rawQuery('''
+SELECT a.id, a.actividad, c.categoria as nombre_categoria
+ FROM Actividad a
+ INNER JOIN Categoria c ON a.id_categoria = c.id
+ ''');
+  }
+
+  // 8. Insertar una nueva categoría
+  Future<int> insertCategory(String categoryName) async {
+    return await insert('Categoria', {'categoria': categoryName});
+  }
+
+  // 9. Insertar una nueva actividad vinculada a una categoría
+  Future<int> insertActivity(String activityName, int categoryId) async {
+    return await insert('Actividad', {
+      'actividad': activityName,
+      'id_categoria': categoryId,
+    });
+  }
+
+  // 10. Eliminar una categoría
+  Future<int> deleteCategory(int id) async {
+    // Gracias a "ON DELETE CASCADE" en tu tabla, al borrar una categoría
+    // se borrarán en cascada las actividades asociadas a ella.
+    return await delete('Categoria', 'id', id);
+  }
+
+  // 11. Eliminar una actividad
+  Future<int> deleteActivity(int id) async {
+    return await delete('Actividad', 'id', id);
+  }
+
+  // 12. Actualizar una categoría usando el método genérico
+  Future<int> updateCategory(int id, String categoryName) async {
+    return await update(
+      'Categoria',
+      {'id': id, 'categoria': categoryName},
+      'id', // Nombre de la columna de la llave primaria
+    );
+  }
+
+  // 13. Actualizar una actividad usando el método genérico
+  Future<int> updateActivity(
+    int id,
+    String activityName,
+    int categoryId,
+  ) async {
+    return await update(
+      'Actividad',
+      {'id': id, 'actividad': activityName, 'id_categoria': categoryId},
+      'id', // Nombre de la columna de la llave primaria
+    );
+  }
 }

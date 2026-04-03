@@ -65,7 +65,7 @@ class Home extends StatelessWidget {
                     text: 'Categorias y actividades',
                     backgroundColor: Color(0xFFD4B8FF),
                     shadowOffset: Offset(0, 8), // Y = 8
-                    onTap: () => Navigator.pushNamed(context, "/list"),
+                    onTap: () => Navigator.pushNamed(context, "/cruds"),
                   ),
                   SizedBox(height: 32),
                   CustomButton(

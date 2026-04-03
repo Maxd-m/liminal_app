@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:liminal_app/screens/home_screen.dart';
 import 'package:liminal_app/screens/list_screen.dart';
 import 'package:liminal_app/screens/calendar_screen.dart';
+import 'package:liminal_app/screens/cruds_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -19,6 +20,7 @@ class MyApp extends StatelessWidget {
       routes: {
         "/list": (context) => ListScreen(),
         "/calendar": (context) => CalendarScreen(),
+        "/cruds": (context) => CrudsScreen(),
         "/home": (context) => Home(),
       },
     );
