@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:liminal_app/components/button_component.dart';
 
 class Home extends StatelessWidget {
   const Home({Key? key}) : super(key: key);
@@ -32,7 +33,7 @@ class Home extends StatelessWidget {
                       style: TextStyle(
                         fontFamily: 'Instrument Serif',
                         fontSize: 42,
-                        color: Color(0xFF2C3989), // Azul oscuro
+                        color: Color(0xFF2E3982), // Azul oscuro
                       ),
                     ),
                     SizedBox(height: 16),
@@ -43,7 +44,7 @@ class Home extends StatelessWidget {
                         fontFamily: 'Instrument Serif',
                         fontSize: 28,
                         height: 1.2,
-                        color: Color(0xFF7CB8C7), // Azul claro / cian
+                        color: Color(0xFFA7E7FF), // Azul claro / cian
                       ),
                     ),
                   ],
@@ -53,23 +54,23 @@ class Home extends StatelessWidget {
               // --- Botones Centrales (Morados) ---
               Column(
                 children: [
-                  _CustomButton(
-                    text: 'Actividades',
-                    backgroundColor: Color(0xFFD3ACFF),
+                  CustomButton(
+                    text: 'Objetivos',
+                    backgroundColor: Color(0xFFD4B8FF),
                     shadowOffset: Offset(0, 8), // Y = 8
                     onTap: () => Navigator.pushNamed(context, "/list"),
                   ),
                   SizedBox(height: 32),
-                  _CustomButton(
+                  CustomButton(
                     text: 'Lorem ipsum',
-                    backgroundColor: Color(0xFFD3ACFF),
+                    backgroundColor: Color(0xFFD4B8FF),
                     shadowOffset: Offset(0, 8), // Y = 8
                     onTap: () => Navigator.pushNamed(context, "/list"),
                   ),
                   SizedBox(height: 32),
-                  _CustomButton(
+                  CustomButton(
                     text: 'Lorem ipsum',
-                    backgroundColor: Color(0xFFD3ACFF),
+                    backgroundColor: Color(0xFFD4B8FF),
                     shadowOffset: Offset(0, 8), // Y = 8
                     onTap: () => Navigator.pushNamed(context, "/list"),
                   ),
@@ -79,67 +80,14 @@ class Home extends StatelessWidget {
               // --- Botón Inferior (Naranja) ---
               Padding(
                 padding: EdgeInsets.only(bottom: 60.0),
-                child: _CustomButton(
+                child: CustomButton(
                   text: 'Lorem ipsum',
-                  backgroundColor: Color(0xFFF9C2A4),
+                  backgroundColor: Color(0xFFFFC6A7),
                   shadowOffset: Offset(0, 4), // Y = 4
                   onTap: () => Navigator.pushNamed(context, "/list"),
                 ),
               ),
             ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// Widget personalizado para aplicar sombras y estilos exactos
-class _CustomButton extends StatelessWidget {
-  final String text;
-  final Color backgroundColor;
-  final Offset shadowOffset;
-  final VoidCallback onTap; // 1. Agregamos esta línea
-
-  const _CustomButton({
-    Key? key,
-    required this.text,
-    required this.backgroundColor,
-    required this.shadowOffset,
-    required this.onTap, // 2. Lo pedimos en el constructor
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 154,
-      height: 58,
-      decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.25),
-            offset: shadowOffset,
-            blurRadius: 4,
-            spreadRadius: 0,
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(16),
-          onTap: onTap, // 3. Le pasamos la acción al InkWell
-          child: Center(
-            child: Text(
-              text,
-              style: const TextStyle(
-                fontFamily: 'Instrument Serif',
-                fontSize: 22,
-                color: Color(0xFF5D6151),
-              ),
-            ),
           ),
         ),
       ),
