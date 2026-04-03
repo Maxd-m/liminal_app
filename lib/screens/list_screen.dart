@@ -166,7 +166,7 @@ class _ListScreenState extends State<ListScreen> {
                           text: 'Ir a Inicio',
                           backgroundColor: const Color(0xFFD3ACFF),
                           shadowOffset: const Offset(0, 4),
-                          onTap: () => Navigator.pop(context),
+                          onTap: () => Navigator.pushNamed(context, "/home"),
                         ),
                         CustomButton(
                           text: 'Filtros',
@@ -246,7 +246,7 @@ class _ListScreenState extends State<ListScreen> {
                           ) {
                             final obj = filteredObjectives[index];
                             // Lógica simple: Si en BD está completado (1), es 'Completado'.
-                            // Si no (0), calculamos si está vencida o en tiempo usando tu función anterior.
+                            // Si no (0), calculamos si está vencido o en tiempo usando tu función anterior.
                             String statusFinal;
                             if (obj['completado'] == 1) {
                               statusFinal = 'Completado'; // Texto exacto
@@ -285,7 +285,7 @@ class _ListScreenState extends State<ListScreen> {
                   backgroundColor: const Color(0xFFD3ACFF),
                   shadowOffset: const Offset(0, 4),
 
-                  onTap: () {},
+                  onTap: () => Navigator.pushNamed(context, '/calendar'),
                 ),
               ),
             ],

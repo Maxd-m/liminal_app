@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:liminal_app/screens/home_screen.dart';
 import 'package:liminal_app/screens/list_screen.dart';
+import 'package:liminal_app/screens/calendar_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,7 +16,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Home(),
-      routes: {"/list": (context) => ListScreen()},
+      routes: {
+        "/list": (context) => ListScreen(),
+        "/calendar": (context) => CalendarScreen(),
+        "/home": (context) => Home(),
+      },
     );
   }
 }
