@@ -1,6 +1,7 @@
 // addObjectiveModalContent_component.dart
 
 import 'package:flutter/material.dart';
+import 'package:badges/badges.dart' as badges;
 import 'package:liminal_app/database/objetivos_db.dart'; // Importa ObjetivosDB
 import 'package:intl/intl.dart';
 
@@ -24,7 +25,7 @@ class AddObjectiveModalContent extends StatefulWidget {
 class _AddObjectiveModalContentState extends State<AddObjectiveModalContent> {
   final ObjetivosDB _databaseHelper =
       ObjetivosDB(); // O AppDB según como lo hayas llamado
-  final _formKey = GlobalKey<FormState>();
+  // final _formKey = GlobalKey<FormState>();
 
   final _nameController = TextEditingController();
   final _antecedentsController = TextEditingController();
@@ -248,14 +249,51 @@ class _AddObjectiveModalContentState extends State<AddObjectiveModalContent> {
           // Cambiamos minAxisSize para que la columna se adapte al contenido
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Reemplaza el Center actual con este:
             Center(
-              child: Text(
-                _isEditing ? 'Editar objetivo' : 'Nuevo objetivo',
-                style: TextStyle(
-                  fontFamily: 'Instrument Serif',
-                  fontSize: 28,
-                  color: Colors.black87,
-                ),
+              child: Column(
+                children: [
+                  Text(
+                    _isEditing ? 'Editar objetivo' : 'Nuevo objetivo',
+                    style: const TextStyle(
+                      fontFamily: 'Instrument Serif',
+                      fontSize: 28,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  // NUEVO: Texto de Cantidad y Badge
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        'Cantidad actividades: ',
+                        style: TextStyle(
+                          fontFamily: 'Instrument Serif',
+                          fontSize: 20,
+                          color: Colors
+                              .black54, // Un poco más tenue para diferenciar del título
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      badges.Badge(
+                        badgeContent: Text(
+                          '${_addedActivities.length}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        badgeStyle: const badges.BadgeStyle(
+                          // Usando el morado de tu tema para que combine
+                          badgeColor: Color(0xFFD3ACFF),
+                          padding: EdgeInsets.all(6),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 20),

@@ -25,8 +25,8 @@ class _DayObjectivesModalContentState extends State<DayObjectivesModalContent> {
   final ObjetivosDB _databaseHelper = ObjetivosDB();
 
   // Estado para la lista de objetivos
-  List<Map<String, dynamic>> _objectives = [];
-  bool _isLoading = true;
+  // List<Map<String, dynamic>> _objectives = [];
+  // bool _isLoading = true;
 
   // NUEVO: Variable para el filtro (Todos, En tiempo, Vencido, Completado)
   String _selectedFilter = 'Todos';

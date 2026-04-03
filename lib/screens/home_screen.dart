@@ -62,14 +62,14 @@ class Home extends StatelessWidget {
                   ),
                   SizedBox(height: 32),
                   CustomButton(
-                    text: 'Lorem ipsum',
+                    text: 'Categorias y actividades',
                     backgroundColor: Color(0xFFD4B8FF),
                     shadowOffset: Offset(0, 8), // Y = 8
                     onTap: () => Navigator.pushNamed(context, "/list"),
                   ),
                   SizedBox(height: 32),
                   CustomButton(
-                    text: 'Lorem ipsum',
+                    text: 'Galería?',
                     backgroundColor: Color(0xFFD4B8FF),
                     shadowOffset: Offset(0, 8), // Y = 8
                     onTap: () => Navigator.pushNamed(context, "/list"),
@@ -80,12 +80,12 @@ class Home extends StatelessWidget {
               // --- Botón Inferior (Naranja) ---
               Padding(
                 padding: EdgeInsets.only(bottom: 60.0),
-                child: CustomButton(
-                  text: 'Lorem ipsum',
-                  backgroundColor: Color(0xFFFFC6A7),
-                  shadowOffset: Offset(0, 4), // Y = 4
-                  onTap: () => Navigator.pushNamed(context, "/list"),
-                ),
+                // child: CustomButton(
+                //   text: 'Lorem ipsum',
+                //   backgroundColor: Color(0xFFFFC6A7),
+                //   shadowOffset: Offset(0, 4), // Y = 4
+                //   onTap: () => Navigator.pushNamed(context, "/list"),
+                // ),
               ),
             ],
           ),

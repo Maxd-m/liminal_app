@@ -5,14 +5,14 @@ class CustomButton extends StatelessWidget {
   final String text;
   final Color backgroundColor;
   final Offset shadowOffset;
-  final VoidCallback onTap; // 1. Agregamos esta línea
+  final VoidCallback onTap;
 
   const CustomButton({
     Key? key,
     required this.text,
     required this.backgroundColor,
     required this.shadowOffset,
-    required this.onTap, // 2. Lo pedimos en el constructor
+    required this.onTap,
   }) : super(key: key);
 
   @override
@@ -36,14 +36,22 @@ class CustomButton extends StatelessWidget {
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
-          onTap: onTap, // 3. Le pasamos la acción al InkWell
+          onTap: onTap,
           child: Center(
-            child: Text(
-              text,
-              style: const TextStyle(
-                fontFamily: 'Instrument Serif',
-                fontSize: 22,
-                color: Color(0xFF5D6151),
+            // 1. Agregamos un Padding para que el texto respire y no toque el borde del botón
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12.0),
+              // 2. Usamos FittedBox para escalar el texto hacia abajo si excede el espacio
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  text,
+                  style: const TextStyle(
+                    fontFamily: 'Instrument Serif',
+                    fontSize: 22, // Este actuará como el tamaño máximo
+                    color: Color(0xFF5D6151),
+                  ),
+                ),
               ),
             ),
           ),
