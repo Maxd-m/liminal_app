@@ -18,6 +18,9 @@ class _ListScreenState extends State<ListScreen> {
   List<Map<String, dynamic>> _objectives = [];
   bool _isLoading = true;
 
+  // NUEVO: Variable para el filtro (Todos, En tiempo, Vencido, Completado)
+  String _selectedFilter = 'Todos';
+
   @override
   void initState() {
     super.initState();
@@ -88,6 +91,20 @@ class _ListScreenState extends State<ListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // FILTRADO DINÁMICO
+    final filteredObjectives = _objectives.where((obj) {
+      if (_selectedFilter == 'Todos') return true;
+
+      // Obtenemos el estado actual del objetivo
+      String status;
+      if (obj['completado'] == 1) {
+        status = 'Completado';
+      } else {
+        status = _calculateStatus(obj['fecha_limite']);
+      }
+
+      return status == _selectedFilter;
+    }).toList();
     return Scaffold(
       // FAB (image_4.png)
       floatingActionButton: FloatingActionButton(
@@ -155,7 +172,41 @@ class _ListScreenState extends State<ListScreen> {
                           text: 'Filtros',
                           backgroundColor: const Color(0xFFD3ACFF),
                           shadowOffset: const Offset(0, 4),
-                          onTap: () {},
+                          onTap: () async {
+                            final result = await showMenu<String>(
+                              context: context,
+                              position: const RelativeRect.fromLTRB(
+                                100,
+                                200,
+                                20,
+                                0,
+                              ), // Ajusta según tu UI
+                              items: [
+                                const PopupMenuItem(
+                                  value: 'Todos',
+                                  child: Text('Todos'),
+                                ),
+                                const PopupMenuItem(
+                                  value: 'En tiempo',
+                                  child: Text('En tiempo'),
+                                ),
+                                const PopupMenuItem(
+                                  value: 'Vencido',
+                                  child: Text('Vencido'),
+                                ),
+                                const PopupMenuItem(
+                                  value: 'Completado',
+                                  child: Text('Completado'),
+                                ),
+                              ],
+                            );
+
+                            if (result != null) {
+                              setState(() {
+                                _selectedFilter = result;
+                              });
+                            }
+                          },
                         ),
                       ],
                     ),
@@ -193,7 +244,7 @@ class _ListScreenState extends State<ListScreen> {
                             context,
                             index,
                           ) {
-                            final obj = _objectives[index];
+                            final obj = filteredObjectives[index];
                             // Lógica simple: Si en BD está completado (1), es 'Completado'.
                             // Si no (0), calculamos si está vencida o en tiempo usando tu función anterior.
                             String statusFinal;
@@ -219,7 +270,7 @@ class _ListScreenState extends State<ListScreen> {
                                 onEliminar: () => _eliminarObjetivo(obj['id']),
                               ),
                             );
-                          }, childCount: _objectives.length),
+                          }, childCount: filteredObjectives.length),
                         ),
                       ),
                   ],
