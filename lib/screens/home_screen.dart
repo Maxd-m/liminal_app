@@ -69,7 +69,7 @@ class Home extends StatelessWidget {
                   ),
                   SizedBox(height: 32),
                   CustomButton(
-                    text: 'Galería?',
+                    text: '¿Galería?',
                     backgroundColor: Color(0xFFD4B8FF),
                     shadowOffset: Offset(0, 8), // Y = 8
                     onTap: () => Navigator.pushNamed(context, "/list"),
