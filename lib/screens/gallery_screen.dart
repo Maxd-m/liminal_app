@@ -22,7 +22,6 @@ class _GalleryScreenState extends State<GalleryScreen> {
     _loadDrawings();
   }
 
-  // Función para leer las imágenes guardadas
   Future<void> _loadDrawings() async {
     setState(() => _isLoading = true);
     try {
@@ -46,14 +45,13 @@ class _GalleryScreenState extends State<GalleryScreen> {
     }
   }
 
-  // NUEVA FUNCIÓN: Eliminar archivo físico y recargar la galería
   Future<void> _deleteDrawing(File file) async {
     try {
       if (await file.exists()) {
         await file.delete();
         if (mounted) {
-          Navigator.pop(context); // Cierra el modal
-          _loadDrawings(); // Recarga la lista de imágenes
+          Navigator.pop(context);
+          _loadDrawings();
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Dibujo eliminado correctamente')),
           );
@@ -64,35 +62,27 @@ class _GalleryScreenState extends State<GalleryScreen> {
     }
   }
 
-  // NUEVA FUNCIÓN: Mostrar el modal con la imagen y los botones
   void _showImageModal(File file) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return Dialog(
-          backgroundColor: Colors
-              .transparent, // Fondo transparente para que destaque la imagen
+          backgroundColor: Colors.transparent,
           insetPadding: const EdgeInsets.all(20),
           child: Column(
-            mainAxisSize:
-                MainAxisSize.min, // Se adapta al tamaño de su contenido
+            mainAxisSize: MainAxisSize.min,
             children: [
-              // Imagen ampliada
               ClipRRect(
                 borderRadius: BorderRadius.circular(15),
                 child: Container(
-                  color:
-                      Colors.white, // Por si el dibujo tiene fondo transparente
+                  color: Colors.white,
                   child: Image.file(file, fit: BoxFit.contain),
                 ),
               ),
               const SizedBox(height: 20),
-
-              // Botones de acción usando tu CustomButton
-              // Usamos un Wrap para evitar errores de espacio en pantallas pequeñas
               Wrap(
-                spacing: 15, // Espacio horizontal entre botones
-                runSpacing: 10, // Espacio vertical si se amontonan
+                spacing: 15,
+                runSpacing: 10,
                 alignment: WrapAlignment.center,
                 children: [
                   CustomButton(
@@ -103,9 +93,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                   ),
                   CustomButton(
                     text: 'Eliminar',
-                    backgroundColor: const Color(
-                      0xFFFFA1A1,
-                    ), // Un rojo suave para la acción de borrar
+                    backgroundColor: const Color(0xFFFFA1A1),
                     shadowOffset: const Offset(0, 4),
                     onTap: () => _deleteDrawing(file),
                   ),
@@ -118,12 +106,31 @@ class _GalleryScreenState extends State<GalleryScreen> {
     );
   }
 
+  // NUEVA FUNCIÓN: Extrae el título del nombre del archivo
+  String _extractTitleFromFile(File file) {
+    String fileName = file.path
+        .split('/')
+        .last; // Ej: onironautica_Mi-Titulo_123456.png
+
+    if (fileName.startsWith('onironautica_')) {
+      // Quitamos el prefijo
+      String withoutPrefix = fileName.replaceFirst('onironautica_', '');
+      // Separamos por el guion bajo "_" para aislar el título del timestamp
+      List<String> parts = withoutPrefix.split('_');
+
+      if (parts.isNotEmpty) {
+        // El primer elemento es nuestro título, y devolvemos los espacios en lugar de guiones
+        return parts[0].replaceAll('-', ' ');
+      }
+    }
+    return 'Sin título';
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          // 1. Imagen de fondo
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
@@ -133,8 +140,6 @@ class _GalleryScreenState extends State<GalleryScreen> {
               ),
             ),
           ),
-
-          // 2. Contenido principal
           SafeArea(
             child: Column(
               children: [
@@ -173,8 +178,6 @@ class _GalleryScreenState extends State<GalleryScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-
-                // Botón "Ir a Inicio"
                 Align(
                   alignment: Alignment.centerLeft,
                   child: Padding(
@@ -187,10 +190,7 @@ class _GalleryScreenState extends State<GalleryScreen> {
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 20),
-
-                // 3. Cuadrícula de imágenes (GridView)
                 Expanded(
                   child: _isLoading
                       ? const Center(child: CircularProgressIndicator())
@@ -208,24 +208,48 @@ class _GalleryScreenState extends State<GalleryScreen> {
                                 crossAxisCount: 2,
                                 crossAxisSpacing: 15,
                                 mainAxisSpacing: 15,
-                                childAspectRatio: 1,
+                                // Cambiamos un poco el aspect ratio para que quepa el texto
+                                childAspectRatio: 0.85,
                               ),
                           itemCount: _savedDrawings.length,
                           itemBuilder: (context, index) {
                             final file = File(_savedDrawings[index].path);
+                            final title = _extractTitleFromFile(
+                              file,
+                            ); // Extraemos el título
 
-                            // AQUI ESTÁ EL CAMBIO: Envolvemos el Container en un GestureDetector
                             return GestureDetector(
                               onTap: () => _showImageModal(file),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[300],
-                                  borderRadius: BorderRadius.circular(5),
-                                  image: DecorationImage(
-                                    image: FileImage(file),
-                                    fit: BoxFit.cover,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  // El texto del título arriba de la imagen
+                                  Text(
+                                    title,
+                                    textAlign: TextAlign.center,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
                                   ),
-                                ),
+                                  const SizedBox(height: 5),
+                                  // La imagen ocupando el resto del espacio
+                                  Expanded(
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[300],
+                                        borderRadius: BorderRadius.circular(5),
+                                        image: DecorationImage(
+                                          image: FileImage(file),
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             );
                           },
@@ -236,8 +260,6 @@ class _GalleryScreenState extends State<GalleryScreen> {
           ),
         ],
       ),
-
-      // 4. Floating Action Button "Nuevo +"
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           final result = await Navigator.push(
