@@ -1,3 +1,4 @@
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:liminal_app/components/button_component.dart';
@@ -169,12 +170,37 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 ),
                 child: Column(
                   children: [
-                    const Text(
-                      'ONIRONAUTICA',
-                      style: TextStyle(
-                        fontFamily: 'Instrument Serif',
-                        fontSize: 42,
-                        color: Color(0xFF7CB8C7),
+                    // const Text(
+                    //   'ONIRONAUTICA',
+                    //   style: TextStyle(
+                    //     fontFamily: 'Instrument Serif',
+                    //     fontSize: 42,
+                    //     color: Color(0xFF7CB8C7),
+                    //   ),
+                    // ),
+                    AnimatedOpacity(
+                      opacity: 1.0,
+                      // : 0.0, // Si es true, opacidad 1 (visible), si no 0 (invisible)
+                      duration: const Duration(milliseconds: 2000),
+                      child: AnimatedTextKit(
+                        repeatForever: true,
+                        animatedTexts: [
+                          ColorizeAnimatedText(
+                            'Onironautica',
+                            textStyle: TextStyle(
+                              fontFamily: 'Instrument Serif',
+                              fontSize: 42,
+                              color: Color(0xFF2E3982),
+                            ),
+                            colors: [
+                              Color(0xFF2E3982),
+                              Color(0xFFD4B8FF),
+                              Color.fromARGB(255, 247, 233, 153),
+                            ],
+                            speed: const Duration(milliseconds: 2000),
+                          ),
+                        ],
+                        isRepeatingAnimation: true,
                       ),
                     ),
                     const Text(
