@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:liminal_app/database/objetivos_db.dart'; // Importa ObjetivosDB
 import 'package:intl/intl.dart';
+import 'package:liminal_app/services/notification_service.dart';
 
 class AddObjectiveModalContent extends StatefulWidget {
   final Function onAddSuccess; // Callback para recargar ListScreen
@@ -169,7 +170,7 @@ class _AddObjectiveModalContentState extends State<AddObjectiveModalContent> {
       return;
     }
 
-    bool success;
+    int success;
 
     // Si estamos editando, llamamos a update, si no, a add
     if (_isEditing) {
@@ -191,7 +192,35 @@ class _AddObjectiveModalContentState extends State<AddObjectiveModalContent> {
       );
     }
 
-    if (success) {
+    if (success != -1) {
+      // 1. Convertimos la fecha String (dd/MM/yyyy) a DateTime
+      // Asumiendo que _dueDate viene de tu DatePicker
+      final parts = _dueDate.split('/');
+      if (parts.length == 3) {
+        final deadlineDate = DateTime(
+          int.parse(parts[2]), // Año
+          int.parse(parts[1]), // Mes
+          int.parse(parts[0]), // Día
+        );
+
+        final notificationId = _isEditing
+            ? widget.objectiveToEdit!['id']
+            : 999; // *Idealmente, tu DB debería devolverte el ID insertado
+
+        // Si se marcó como completado, cancelamos la alarma, si no, la programamos
+        if (_isCompleted) {
+          await NotificationService().cancelNotification(notificationId);
+        } else {
+          await NotificationService().scheduleObjectiveNotification(
+            id: notificationId,
+            title: '¡Objetivo por vencer!',
+            body:
+                'El objetivo "${_nameController.text}" vence en 2 días. ¡Tú puedes!',
+            deadline: deadlineDate,
+          );
+        }
+      }
+
       widget.onAddSuccess();
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
@@ -202,29 +231,7 @@ class _AddObjectiveModalContentState extends State<AddObjectiveModalContent> {
         ),
       );
     }
-
-    // final success = await _databaseHelper.addObjectiveWithActivities(
-    //   name: _nameController.text,
-    //   antecedents: _antecedentsController.text,
-    //   dueDate: _dueDate,
-    //   isCompleted: _isCompleted,
-    //   activitiesWithPriorities: _addedActivities
-    //       .map(
-    //         (a) => {
-    //           'idActividad': a['idActividad'],
-    //           'prioridad': a['prioridad'],
-    //         },
-    //       )
-    //       .toList(),
-    // );
-
-    // if (success) {
-    //   widget.onAddSuccess();
-    //   Navigator.pop(context);
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     const SnackBar(content: Text('Objetivo añadido con éxito')),
-    //   );
-    // }
+    await NotificationService().checkPendingNotifications();
   }
 
   @override

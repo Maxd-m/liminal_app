@@ -4,7 +4,13 @@ import 'package:liminal_app/screens/list_screen.dart';
 import 'package:liminal_app/screens/calendar_screen.dart';
 import 'package:liminal_app/screens/cruds_screen.dart';
 
-void main() {
+import 'package:liminal_app/services/notification_service.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // Importante
+
+  // Inicializamos notificaciones
+  await NotificationService().init();
   runApp(const MyApp());
 }
 

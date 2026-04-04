@@ -169,7 +169,7 @@ class ObjetivosDB {
   }
 
   // 4. Transacción compleja: Añadir un Objetivo y sus relaciones con actividades
-  Future<bool> addObjectiveWithActivities({
+  Future<int> addObjectiveWithActivities({
     required String name,
     required String antecedents,
     required String dueDate,
@@ -177,9 +177,11 @@ class ObjetivosDB {
     required List<Map<String, dynamic>> activitiesWithPriorities,
   }) async {
     var db = await database;
+    int objectiveId =
+        -1; // Variable para almacenar el ID del objetivo insertado
     try {
       await db!.transaction((txn) async {
-        int objectiveId = await txn.insert('Objetivo', {
+        objectiveId = await txn.insert('Objetivo', {
           'objetivo': name,
           'antecedentes': antecedents,
           'fecha_limite': dueDate,
@@ -194,10 +196,10 @@ class ObjetivosDB {
           });
         }
       });
-      return true;
+      return objectiveId;
     } catch (e) {
       print('Error al añadir objetivo: $e');
-      return false;
+      return -1;
     }
   }
 
@@ -219,7 +221,7 @@ class ObjetivosDB {
   }
 
   // 6. Transacción para Actualizar un Objetivo y sus actividades
-  Future<bool> updateObjectiveWithActivities({
+  Future<int> updateObjectiveWithActivities({
     required int id,
     required String name,
     required String antecedents,
@@ -259,10 +261,10 @@ class ObjetivosDB {
           });
         }
       });
-      return true;
+      return 1;
     } catch (e) {
       print('Error al actualizar objetivo: $e');
-      return false;
+      return -1;
     }
   }
 
