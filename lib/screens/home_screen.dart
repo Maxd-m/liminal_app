@@ -133,7 +133,7 @@ class _HomeState extends State<Home> {
                     text: '¿Galería?',
                     backgroundColor: Color(0xFFD4B8FF),
                     shadowOffset: Offset(0, 8), // Y = 8
-                    onTap: () => Navigator.pushNamed(context, "/list"),
+                    onTap: () => Navigator.pushNamed(context, "/gallery"),
                   ),
                 ],
               ),

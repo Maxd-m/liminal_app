@@ -143,14 +143,6 @@ class _ListScreenState extends State<ListScreen> {
                 ),
                 child: Column(
                   children: [
-                    // const Text(
-                    //   'ONIRONAUTICA',
-                    //   style: TextStyle(
-                    //     fontFamily: 'Instrument Serif',
-                    //     fontSize: 42,
-                    //     color: Color(0xFF7CB8C7),
-                    //   ),
-                    // ),
                     AnimatedOpacity(
                       opacity: 1.0,
                       // : 0.0, // Si es true, opacidad 1 (visible), si no 0 (invisible)
